@@ -123,9 +123,12 @@ function unlockPanel() {
   // Initialize Supabase using Service Role key so the admin can write/delete records
   supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   
+  // Wire up all interactive elements
+  setupEventListeners();
+  setupTheme();
+
   // Load Database values
   loadAllData();
-  setupTheme();
 }
 
 function showToast(message, isError = false) {
@@ -600,8 +603,9 @@ function setupEventListeners() {
   dom.productForm.addEventListener('submit', handleProductFormSubmit);
 }
 
-// Startup
-document.addEventListener('DOMContentLoaded', setupAuth);
-if (document.readyState === 'interactive' || document.readyState === 'complete') {
+// Startup — single safe init regardless of when script loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupAuth);
+} else {
   setupAuth();
 }
