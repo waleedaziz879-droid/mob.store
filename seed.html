@@ -11,7 +11,7 @@
       color: #e2e8f0;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 2rem;
     }
@@ -20,12 +20,67 @@
       border: 1px solid #2d2d44;
       border-radius: 16px;
       padding: 2.5rem;
-      max-width: 700px;
+      max-width: 780px;
       width: 100%;
     }
     h1 { font-size: 1.6rem; margin-bottom: 0.4rem; color: #00e5ff; }
-    p  { color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.9rem; }
-    button {
+    .subtitle { color: #94a3b8; margin-bottom: 2rem; font-size: 0.9rem; }
+
+    /* Steps */
+    .steps { display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2rem; }
+    .step {
+      background: #111127;
+      border: 1px solid #2d2d44;
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+    }
+    .step.active  { border-color: #00e5ff; }
+    .step.done    { border-color: #4ade80; opacity: 0.7; }
+    .step-header  { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #2d2d44;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: #94a3b8;
+      flex-shrink: 0;
+    }
+    .step.active .step-num  { background: #00e5ff; color: #000; }
+    .step.done   .step-num  { background: #4ade80; color: #000; }
+    .step-title { font-weight: 600; font-size: 1rem; }
+    .step-body  { color: #94a3b8; font-size: 0.875rem; line-height: 1.6; }
+
+    /* SQL block */
+    .sql-block-wrap { position: relative; margin-top: 1rem; }
+    .sql-block {
+      background: #0d0d18;
+      border: 1px solid #2d2d44;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre;
+      color: #a5f3fc;
+      line-height: 1.5;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 0.35rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .copy-btn:hover { background: #6d28d9; }
+
+    /* Buttons */
+    .btn {
       background: linear-gradient(135deg, #00e5ff, #7c3aed);
       color: white;
       border: none;
@@ -38,8 +93,25 @@
       margin-bottom: 1.5rem;
       transition: opacity 0.2s;
     }
-    button:hover { opacity: 0.85; }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn:hover    { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-open {
+      display: block;
+      background: #1e40af;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+    .btn-open:hover { background: #1d4ed8; }
+
+    /* Log */
     #log {
       background: #0d0d18;
       border: 1px solid #2d2d44;
@@ -47,22 +119,109 @@
       padding: 1rem;
       font-family: monospace;
       font-size: 0.82rem;
-      max-height: 420px;
+      max-height: 300px;
       overflow-y: auto;
       white-space: pre-wrap;
+      display: none;
     }
-    .ok  { color: #4ade80; }
-    .err { color: #f87171; }
-    .inf { color: #60a5fa; }
+    .ok   { color: #4ade80; }
+    .err  { color: #f87171; }
+    .inf  { color: #60a5fa; }
     .warn { color: #fbbf24; }
   </style>
 </head>
 <body>
 <div class="card">
   <h1>⚡ Electra DB Seeder</h1>
-  <p>Creates all tables and seeds 6 flagship phones into your Supabase database.</p>
-  <button id="seedBtn" onclick="runSeed()">🚀 Seed Database Now</button>
-  <div id="log">Ready. Click the button above to begin...\n</div>
+  <p class="subtitle">Follow the 2 steps below to create your database tables and seed all 6 products.</p>
+
+  <div class="steps">
+
+    <!-- STEP 1 -->
+    <div class="step active" id="step1">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div class="step-title">Create Database Tables in Supabase</div>
+      </div>
+      <div class="step-body">
+        Copy the SQL below, then open your Supabase SQL Editor and run it.
+        <div class="sql-block-wrap">
+          <pre class="sql-block" id="schemaSql">-- Electra Mobile Store Schema
+DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+
+CREATE TABLE products (
+  id            TEXT PRIMARY KEY,
+  name          TEXT NOT NULL,
+  brand         TEXT NOT NULL,
+  price         NUMERIC NOT NULL CHECK (price >= 0),
+  rating        NUMERIC NOT NULL DEFAULT 5.0,
+  reviews_count INTEGER NOT NULL DEFAULT 0,
+  description   TEXT,
+  colors        JSONB NOT NULL,
+  storage       JSONB NOT NULL,
+  specs         JSONB NOT NULL,
+  featured      BOOLEAN DEFAULT FALSE,
+  created_at    TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+CREATE TABLE orders (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_name    TEXT NOT NULL,
+  customer_email   TEXT NOT NULL,
+  shipping_address TEXT NOT NULL,
+  subtotal         NUMERIC NOT NULL,
+  tax              NUMERIC NOT NULL,
+  shipping         NUMERIC NOT NULL,
+  total            NUMERIC NOT NULL,
+  status           TEXT DEFAULT 'Pending'
+                     CHECK (status IN ('Pending','Shipped','Delivered','Cancelled')),
+  created_at       TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+CREATE TABLE order_items (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id     UUID REFERENCES orders(id) ON DELETE CASCADE NOT NULL,
+  product_id   TEXT NOT NULL,
+  product_name TEXT NOT NULL,
+  color        TEXT NOT NULL,
+  storage      TEXT NOT NULL,
+  price        NUMERIC NOT NULL,
+  quantity     INTEGER NOT NULL CHECK (quantity > 0)
+);
+
+ALTER TABLE products   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "all_products"    ON products    FOR ALL TO public USING (true) WITH CHECK (true);
+CREATE POLICY "all_orders"      ON orders      FOR ALL TO public USING (true) WITH CHECK (true);
+CREATE POLICY "all_order_items" ON order_items FOR ALL TO public USING (true) WITH CHECK (true);
+</pre>
+          <button class="copy-btn" onclick="copySQL()">📋 Copy SQL</button>
+        </div>
+        <a class="btn-open" href="https://supabase.com/dashboard/project/ujucxtgslqozntbvqgts/sql/new" target="_blank">
+          🔗 Open Supabase SQL Editor →
+        </a>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step2">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div class="step-title">Seed All 6 Products into the Database</div>
+      </div>
+      <div class="step-body">
+        After running the SQL above, click the button below to insert all products automatically.
+      </div>
+    </div>
+
+  </div>
+
+  <button class="btn" id="seedBtn" onclick="runSeed()">🚀 Seed 6 Products Now</button>
+  <div id="log"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -70,6 +229,7 @@
 <script>
 const logEl = document.getElementById('log');
 function log(msg, type = 'inf') {
+  logEl.style.display = 'block';
   const span = document.createElement('span');
   span.className = type;
   span.textContent = msg + '\n';
@@ -77,166 +237,89 @@ function log(msg, type = 'inf') {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
+function copySQL() {
+  const sql = document.getElementById('schemaSql').textContent;
+  navigator.clipboard.writeText(sql).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy SQL', 2000);
+  });
+}
+
 const PRODUCTS = [
   {
-    id: "iphone-15-pro-max",
-    name: "iPhone 15 Pro Max",
-    brand: "Apple",
-    price: 1199,
-    rating: 4.9,
-    reviews_count: 142,
+    id: "iphone-15-pro-max", name: "iPhone 15 Pro Max", brand: "Apple",
+    price: 1199, rating: 4.9, reviews_count: 142,
     description: "Forged in titanium and featuring the groundbreaking A17 Pro chip, a customizable Action button, and the most powerful iPhone camera system ever.",
     colors: [
       { name: "Titanium Black", hex: "#232426", image: "assets/iphone.png" },
       { name: "Titanium Blue",  hex: "#2f4452", image: "assets/iphone.png" },
       { name: "Titanium White", hex: "#e3e4e5", image: "assets/iphone.png" }
     ],
-    storage: [
-      { size: "256GB", extraPrice: 0 },
-      { size: "512GB", extraPrice: 200 },
-      { size: "1TB",   extraPrice: 400 }
-    ],
-    specs: {
-      display:   '6.7" Super Retina XDR OLED, 120Hz',
-      processor: "A17 Pro chip (3nm)",
-      camera:    "48MP Main + 12MP Ultra Wide + 12MP 5x Telephoto",
-      battery:   "4441 mAh, 25W fast charging",
-      os:        "iOS 17 (Upgradable)",
-      weight:    "221g"
-    },
+    storage: [{ size:"256GB",extraPrice:0 },{ size:"512GB",extraPrice:200 },{ size:"1TB",extraPrice:400 }],
+    specs: { display:'6.7" Super Retina XDR OLED, 120Hz', processor:"A17 Pro chip (3nm)", camera:"48MP Main + 12MP Ultra Wide + 12MP 5x Telephoto", battery:"4441 mAh, 25W", os:"iOS 17", weight:"221g" },
     featured: true
   },
   {
-    id: "galaxy-s24-ultra",
-    name: "Galaxy S24 Ultra",
-    brand: "Samsung",
-    price: 1299,
-    rating: 4.8,
-    reviews_count: 198,
-    description: "Welcome to the era of mobile AI. With Galaxy S24 Ultra in your hands, you can unleash whole new levels of creativity, productivity and possibility.",
+    id: "galaxy-s24-ultra", name: "Galaxy S24 Ultra", brand: "Samsung",
+    price: 1299, rating: 4.8, reviews_count: 198,
+    description: "Welcome to the era of mobile AI. Unleash creativity, productivity and possibility with Galaxy S24 Ultra.",
     colors: [
-      { name: "Titanium Gray",   hex: "#8e8e90", image: "assets/galaxy.png" },
-      { name: "Titanium Yellow", hex: "#ece3cc", image: "assets/galaxy.png" },
-      { name: "Titanium Violet", hex: "#4b415a", image: "assets/galaxy.png" }
+      { name:"Titanium Gray",   hex:"#8e8e90", image:"assets/galaxy.png" },
+      { name:"Titanium Yellow", hex:"#ece3cc", image:"assets/galaxy.png" },
+      { name:"Titanium Violet", hex:"#4b415a", image:"assets/galaxy.png" }
     ],
-    storage: [
-      { size: "256GB", extraPrice: 0 },
-      { size: "512GB", extraPrice: 120 },
-      { size: "1TB",   extraPrice: 360 }
-    ],
-    specs: {
-      display:   '6.8" Dynamic AMOLED 2X, 120Hz, HDR10+',
-      processor: "Snapdragon 8 Gen 3 for Galaxy",
-      camera:    "200MP Main + 50MP Periscope + 12MP Ultra Wide + 10MP Telephoto",
-      battery:   "5000 mAh, 45W fast charging",
-      os:        "Android 14 (One UI 6.1)",
-      weight:    "232g"
-    },
+    storage: [{ size:"256GB",extraPrice:0 },{ size:"512GB",extraPrice:120 },{ size:"1TB",extraPrice:360 }],
+    specs: { display:'6.8" Dynamic AMOLED 2X, 120Hz', processor:"Snapdragon 8 Gen 3", camera:"200MP Main + 50MP Periscope + 12MP Ultra Wide", battery:"5000 mAh, 45W", os:"Android 14", weight:"232g" },
     featured: true
   },
   {
-    id: "pixel-8-pro",
-    name: "Pixel 8 Pro",
-    brand: "Google",
-    price: 999,
-    rating: 4.7,
-    reviews_count: 110,
-    description: "The all-pro phone engineered by Google. The best of Google AI, the most advanced Pixel Camera ever, and helps you do more, even faster.",
+    id: "pixel-8-pro", name: "Pixel 8 Pro", brand: "Google",
+    price: 999, rating: 4.7, reviews_count: 110,
+    description: "The all-pro phone engineered by Google. Best of Google AI, the most advanced Pixel Camera, and helps you do more faster.",
     colors: [
-      { name: "Bay Blue",  hex: "#a4c2e6", image: "assets/pixel.png" },
-      { name: "Obsidian",  hex: "#2d2d2d", image: "assets/pixel.png" },
-      { name: "Porcelain", hex: "#f4f0ea", image: "assets/pixel.png" }
+      { name:"Bay Blue",  hex:"#a4c2e6", image:"assets/pixel.png" },
+      { name:"Obsidian",  hex:"#2d2d2d", image:"assets/pixel.png" },
+      { name:"Porcelain", hex:"#f4f0ea", image:"assets/pixel.png" }
     ],
-    storage: [
-      { size: "128GB", extraPrice: 0 },
-      { size: "256GB", extraPrice: 60 },
-      { size: "512GB", extraPrice: 180 }
-    ],
-    specs: {
-      display:   '6.7" LTPO OLED, 120Hz, 2400 nits',
-      processor: "Google Tensor G3 (4nm)",
-      camera:    "50MP Main + 48MP Ultra Wide + 48MP 5x Telephoto",
-      battery:   "5050 mAh, 30W fast charging",
-      os:        "Android 14 (Pure Pixel Experience)",
-      weight:    "213g"
-    },
+    storage: [{ size:"128GB",extraPrice:0 },{ size:"256GB",extraPrice:60 },{ size:"512GB",extraPrice:180 }],
+    specs: { display:'6.7" LTPO OLED, 120Hz, 2400 nits', processor:"Google Tensor G3", camera:"50MP Main + 48MP Ultra Wide + 48MP 5x Telephoto", battery:"5050 mAh, 30W", os:"Android 14", weight:"213g" },
     featured: true
   },
   {
-    id: "oneplus-12",
-    name: "OnePlus 12",
-    brand: "OnePlus",
-    price: 799,
-    rating: 4.8,
-    reviews_count: 85,
-    description: "Redefined flagship specs. Combining latest hardware with custom optimization, the OnePlus 12 delivers smooth performance, elite cameras, and ultra-fast charging.",
+    id: "oneplus-12", name: "OnePlus 12", brand: "OnePlus",
+    price: 799, rating: 4.8, reviews_count: 85,
+    description: "Redefined flagship specs — smooth performance, elite cameras, and 100W ultra-fast charging.",
     colors: [
-      { name: "Flowy Emerald", hex: "#4e6a57", image: "assets/oneplus.png" },
-      { name: "Silky Black",   hex: "#1f2022", image: "assets/oneplus.png" }
+      { name:"Flowy Emerald", hex:"#4e6a57", image:"assets/oneplus.png" },
+      { name:"Silky Black",   hex:"#1f2022", image:"assets/oneplus.png" }
     ],
-    storage: [
-      { size: "256GB", extraPrice: 0 },
-      { size: "512GB", extraPrice: 100 }
-    ],
-    specs: {
-      display:   '6.82" LTPO2 AMOLED, 120Hz, 4500 nits',
-      processor: "Snapdragon 8 Gen 3 (4nm)",
-      camera:    "50MP Main + 64MP 3x Periscope + 48MP Ultra Wide",
-      battery:   "5400 mAh, 100W SuperVOOC",
-      os:        "Android 14 (OxygenOS 14)",
-      weight:    "220g"
-    },
+    storage: [{ size:"256GB",extraPrice:0 },{ size:"512GB",extraPrice:100 }],
+    specs: { display:'6.82" LTPO2 AMOLED, 120Hz', processor:"Snapdragon 8 Gen 3", camera:"50MP Main + 64MP Periscope + 48MP Ultra Wide", battery:"5400 mAh, 100W SuperVOOC", os:"Android 14 (OxygenOS 14)", weight:"220g" },
     featured: false
   },
   {
-    id: "xiaomi-14-ultra",
-    name: "Xiaomi 14 Ultra",
-    brand: "Xiaomi",
-    price: 1099,
-    rating: 4.9,
-    reviews_count: 74,
-    description: "Co-engineered with Leica, featuring a quad-camera system with a massive 1-inch sensor and stepless variable aperture. A masterpiece of optical engineering.",
+    id: "xiaomi-14-ultra", name: "Xiaomi 14 Ultra", brand: "Xiaomi",
+    price: 1099, rating: 4.9, reviews_count: 74,
+    description: "Co-engineered with Leica — quad cameras with a massive 1-inch sensor and stepless variable aperture.",
     colors: [
-      { name: "Black Leather", hex: "#1a1a1a", image: "assets/xiaomi.png" },
-      { name: "White Leather", hex: "#eaeaea", image: "assets/xiaomi.png" }
+      { name:"Black Leather", hex:"#1a1a1a", image:"assets/xiaomi.png" },
+      { name:"White Leather", hex:"#eaeaea", image:"assets/xiaomi.png" }
     ],
-    storage: [
-      { size: "512GB", extraPrice: 0 }
-    ],
-    specs: {
-      display:   '6.73" LTPO AMOLED, 120Hz, Dolby Vision',
-      processor: "Snapdragon 8 Gen 3 (4nm)",
-      camera:    '50MP Leica 1" Main + 50MP Telephoto + 50MP Periscope + 50MP Ultra Wide',
-      battery:   "5000 mAh, 90W HyperCharge",
-      os:        "Android 14 (HyperOS)",
-      weight:    "220g"
-    },
+    storage: [{ size:"512GB",extraPrice:0 }],
+    specs: { display:'6.73" LTPO AMOLED, 120Hz', processor:"Snapdragon 8 Gen 3", camera:'50MP Leica 1" Main + 50MP Telephoto + 50MP Periscope + 50MP Ultra Wide', battery:"5000 mAh, 90W HyperCharge", os:"Android 14 (HyperOS)", weight:"220g" },
     featured: false
   },
   {
-    id: "xperia-1-vi",
-    name: "Xperia 1 VI",
-    brand: "Sony",
-    price: 1199,
-    rating: 4.6,
-    reviews_count: 43,
-    description: "Designed for creators and audiophiles. Features a unique optical telephoto zoom lens (85-170mm), a brilliant OLED display, and high-res audio jacks.",
+    id: "xperia-1-vi", name: "Xperia 1 VI", brand: "Sony",
+    price: 1199, rating: 4.6, reviews_count: 43,
+    description: "Built for creators and audiophiles. Optical telephoto zoom (85-170mm), brilliant OLED, and high-res audio.",
     colors: [
-      { name: "Black",       hex: "#111111", image: "assets/xperia.png" },
-      { name: "Khaki Green", hex: "#44493f", image: "assets/xperia.png" }
+      { name:"Black",       hex:"#111111", image:"assets/xperia.png" },
+      { name:"Khaki Green", hex:"#44493f", image:"assets/xperia.png" }
     ],
-    storage: [
-      { size: "256GB", extraPrice: 0 },
-      { size: "512GB", extraPrice: 150 }
-    ],
-    specs: {
-      display:   '6.5" OLED, 120Hz, 19.5:9 ratio',
-      processor: "Snapdragon 8 Gen 3 (4nm)",
-      camera:    "48MP Main + 12MP Continuous Telephoto + 12MP Ultra Wide",
-      battery:   "5000 mAh, 30W USB-PD",
-      os:        "Android 14",
-      weight:    "192g"
-    },
+    storage: [{ size:"256GB",extraPrice:0 },{ size:"512GB",extraPrice:150 }],
+    specs: { display:'6.5" OLED, 120Hz, 19.5:9', processor:"Snapdragon 8 Gen 3", camera:"48MP Main + 12MP Telephoto + 12MP Ultra Wide", battery:"5000 mAh, 30W", os:"Android 14", weight:"192g" },
     featured: false
   }
 ];
@@ -246,76 +329,76 @@ async function runSeed() {
   btn.disabled = true;
   btn.textContent = '⏳ Seeding...';
   logEl.innerHTML = '';
+  logEl.style.display = 'block';
 
   log('🔌 Connecting to Supabase...', 'inf');
-
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  log(`📡 Connected: ${SUPABASE_URL}`, 'ok');
 
-  log(`📡 Connected to: ${SUPABASE_URL}`, 'ok');
-  log('', 'inf');
-
-  // Check if table exists by trying a select
   log('🔍 Checking if products table exists...', 'inf');
-  const { data: existing, error: checkErr } = await db.from('products').select('id').limit(1);
+  const { data: check, error: checkErr } = await db.from('products').select('id').limit(1);
 
-  if (checkErr && checkErr.code === '42P01') {
-    log('⚠️  Table does not exist!', 'warn');
-    log('', 'warn');
-    log('══════════════════════════════════════════', 'warn');
-    log('ACTION REQUIRED: Run schema.sql first!', 'warn');
-    log('══════════════════════════════════════════', 'warn');
-    log('', 'warn');
-    log('1. Go to: https://supabase.com/dashboard/project/ujucxtgslqozntbvqgts/sql', 'warn');
-    log('2. Open a New Query tab', 'warn');
-    log('3. Paste the contents of schema.sql', 'warn');
-    log('4. Click "Run"', 'warn');
-    log('5. Come back here and click Seed again!', 'warn');
-    btn.disabled = false;
-    btn.textContent = '🚀 Seed Database Now';
-    return;
-  }
-
+  // Table missing — code PGRST205 or 42P01
   if (checkErr) {
-    log(`❌ Connection error: ${checkErr.message}`, 'err');
-    log(`Code: ${checkErr.code}`, 'err');
+    log('', 'warn');
+    log('❌ Table not found! Error: ' + checkErr.message, 'err');
+    log('Code: ' + checkErr.code, 'err');
+    log('', 'warn');
+    log('══════════════════════════════════════', 'warn');
+    log('👆  STEP 1 IS NOT DONE YET', 'warn');
+    log('══════════════════════════════════════', 'warn');
+    log('Please:', 'warn');
+    log('  1. Copy the SQL from Step 1 above', 'warn');
+    log('  2. Open the Supabase SQL Editor link', 'warn');
+    log('  3. Paste and click RUN', 'warn');
+    log('  4. Come back and click Seed again!', 'warn');
     btn.disabled = false;
-    btn.textContent = '🔁 Retry Seed';
+    btn.textContent = '🔁 Try Again After Running SQL';
+
+    // Highlight step 1
+    document.getElementById('step1').style.borderColor = '#f87171';
     return;
   }
 
-  if (existing && existing.length > 0) {
-    log(`ℹ️  Table already has ${existing.length}+ rows. Will upsert (merge) all products.`, 'inf');
+  // Mark step 1 done
+  document.getElementById('step1').className = 'step done';
+  document.getElementById('step2').className = 'step active';
+  log('✅ Table exists!', 'ok');
+
+  if (check && check.length > 0) {
+    log(`ℹ️  Table already has data — will upsert (safe to re-run).`, 'inf');
   } else {
-    log('✅ Table is empty — fresh seed!', 'ok');
+    log('📭 Table is empty — fresh seed!', 'inf');
   }
 
   log('', 'inf');
-  log(`📦 Seeding ${PRODUCTS.length} products...`, 'inf');
-  log('', 'inf');
+  log(`📦 Inserting ${PRODUCTS.length} products...`, 'inf');
 
-  let successCount = 0;
-  for (const product of PRODUCTS) {
-    const { error } = await db.from('products').upsert(product, { onConflict: 'id' });
+  let ok = 0;
+  for (const p of PRODUCTS) {
+    const { error } = await db.from('products').upsert(p, { onConflict: 'id' });
     if (error) {
-      log(`  ❌ FAILED: ${product.name} — ${error.message}`, 'err');
+      log(`  ❌ ${p.name}: ${error.message}`, 'err');
     } else {
-      log(`  ✅ ${product.name} (${product.brand}) — $${product.price}`, 'ok');
-      successCount++;
+      log(`  ✅ ${p.name} (${p.brand}) — $${p.price}`, 'ok');
+      ok++;
     }
   }
 
   log('', 'inf');
-  log(`══════════════════════════════════════════`, successCount === PRODUCTS.length ? 'ok' : 'warn');
-  log(`✅ Done! ${successCount}/${PRODUCTS.length} products seeded successfully.`, successCount === PRODUCTS.length ? 'ok' : 'warn');
-  log(`══════════════════════════════════════════`, successCount === PRODUCTS.length ? 'ok' : 'warn');
-  log('', 'ok');
-  log('🛍️  Your store is ready! Visit:', 'ok');
-  log('   https://waleedaziz879-droid.github.io/mob.store/', 'ok');
-  log('🔐 Admin Panel:', 'ok');
-  log('   https://waleedaziz879-droid.github.io/mob.store/admin.html', 'ok');
-
-  btn.textContent = '✅ Seeded!';
+  if (ok === PRODUCTS.length) {
+    log('🎉 ALL ' + ok + ' PRODUCTS SEEDED SUCCESSFULLY!', 'ok');
+    log('', 'ok');
+    log('🛍️  Storefront → https://waleedaziz879-droid.github.io/mob.store/', 'ok');
+    log('🔐  Admin Panel → https://waleedaziz879-droid.github.io/mob.store/admin.html', 'ok');
+    btn.textContent = '✅ All Done!';
+    document.getElementById('step2').className = 'step done';
+  } else {
+    log(`⚠️  ${ok}/${PRODUCTS.length} seeded. Check errors above.`, 'warn');
+    btn.disabled = false;
+    btn.textContent = '🔁 Retry';
+  }
 }
 </script>
 </body>
