@@ -1,0 +1,11 @@
+# Environment variables (keep these private)
+.env
+.env.local
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Node (in case of future migration)
+node_modules/
+dist/
