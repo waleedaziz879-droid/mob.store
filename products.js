@@ -159,5 +159,167 @@ export const products = [
       weight: "192g"
     },
     featured: false
+  },
+  {
+    id: "iphone-15",
+    name: "iPhone 15",
+    brand: "Apple",
+    price: 799,
+    rating: 4.7,
+    reviewsCount: 203,
+    description: "iPhone 15 features a stunning 6.1-inch Super Retina XDR display, the powerful A16 Bionic chip, and a 48MP main camera that captures extraordinary detail.",
+    colors: [
+      { name: "Pink",          hex: "#f4b8c1", image: "assets/iphone15.png" },
+      { name: "Yellow",        hex: "#f5e27a", image: "assets/iphone15.png" },
+      { name: "Green",         hex: "#a8d5b5", image: "assets/iphone15.png" },
+      { name: "Black",         hex: "#1c1c1e", image: "assets/iphone15.png" }
+    ],
+    storage: [
+      { size: "128GB", extraPrice: 0 },
+      { size: "256GB", extraPrice: 100 },
+      { size: "512GB", extraPrice: 300 }
+    ],
+    specs: {
+      display:   '6.1" Super Retina XDR OLED, 60Hz',
+      processor: "A16 Bionic chip (4nm)",
+      camera:    "48MP Main + 12MP Ultra Wide",
+      battery:   "3877 mAh, 20W fast charging",
+      os:        "iOS 17 (Upgradable)",
+      weight:    "171g"
+    },
+    featured: false
+  },
+  {
+    id: "galaxy-a55-5g",
+    name: "Galaxy A55 5G",
+    brand: "Samsung",
+    price: 449,
+    rating: 4.5,
+    reviewsCount: 316,
+    description: "The Galaxy A55 5G brings flagship-level design and features to the mid-range. IP67 rated, Gorilla Glass Victus+, and a 50MP OIS camera — all at an accessible price.",
+    colors: [
+      { name: "Awesome Iceblue", hex: "#a8cce0", image: "assets/galaxy_a55.png" },
+      { name: "Awesome Navy",    hex: "#1a2744", image: "assets/galaxy_a55.png" },
+      { name: "Awesome Lilac",   hex: "#c8b8d8", image: "assets/galaxy_a55.png" }
+    ],
+    storage: [
+      { size: "128GB", extraPrice: 0 },
+      { size: "256GB", extraPrice: 50 }
+    ],
+    specs: {
+      display:   '6.6" Super AMOLED, 120Hz, FHD+',
+      processor: "Exynos 1480 (4nm)",
+      camera:    "50MP OIS Main + 12MP Ultra Wide + 5MP Macro",
+      battery:   "5000 mAh, 25W fast charging",
+      os:        "Android 14 (One UI 6.1)",
+      weight:    "213g"
+    },
+    featured: false
+  },
+  {
+    id: "nothing-phone-2",
+    name: "Nothing Phone 2",
+    brand: "Nothing",
+    price: 599,
+    rating: 4.6,
+    reviewsCount: 88,
+    description: "Nothing Phone 2 redefines transparency — literally. With its iconic Glyph Interface on the back, Snapdragon 8+ Gen 1, and a clean Nothing OS, this phone stands apart.",
+    colors: [
+      { name: "White", hex: "#f0f0f0", image: "assets/nothing2.png" },
+      { name: "Dark Grey", hex: "#2a2a2a", image: "assets/nothing2.png" }
+    ],
+    storage: [
+      { size: "128GB", extraPrice: 0 },
+      { size: "256GB", extraPrice: 80 },
+      { size: "512GB", extraPrice: 160 }
+    ],
+    specs: {
+      display:   '6.7" LTPO OLED, 120Hz, 1600 nits',
+      processor: "Snapdragon 8+ Gen 1 (4nm)",
+      camera:    "50MP OIS Main + 50MP Ultra Wide",
+      battery:   "4700 mAh, 45W fast charging",
+      os:        "Android 14 (Nothing OS 2.5)",
+      weight:    "201g"
+    },
+    featured: false
+  },
+  {
+    id: "motorola-edge-50-pro",
+    name: "Motorola Edge 50 Pro",
+    brand: "Motorola",
+    price: 699,
+    rating: 4.5,
+    reviewsCount: 67,
+    description: "The Edge 50 Pro combines a stunning curved pOLED display with blazing-fast 125W TurboPower charging and a versatile 50MP triple camera with optical zoom.",
+    colors: [
+      { name: "Luxe Lavender", hex: "#c4a8d4", image: "assets/motorola.png" },
+      { name: "Black Beauty",  hex: "#1a1a1a", image: "assets/motorola.png" },
+      { name: "Moonlight Pearl", hex: "#e8e4dc", image: "assets/motorola.png" }
+    ],
+    storage: [
+      { size: "256GB", extraPrice: 0 },
+      { size: "512GB", extraPrice: 100 }
+    ],
+    specs: {
+      display:   '6.7" curved pOLED, 144Hz, HDR10+',
+      processor: "Snapdragon 7 Gen 3 (4nm)",
+      camera:    "50MP OIS Main + 10MP 3x Telephoto + 13MP Ultra Wide",
+      battery:   "4500 mAh, 125W TurboPower",
+      os:        "Android 14 (Hello UI)",
+      weight:    "186g"
+    },
+    featured: false
+  },
+  {
+    id: "vivo-x100-pro",
+    name: "Vivo X100 Pro",
+    brand: "Vivo",
+    price: 999,
+    rating: 4.8,
+    reviewsCount: 54,
+    description: "Co-engineered with Zeiss, the X100 Pro features a 1-inch Sony sensor, real-time portrait bokeh, and 100W FlashCharge. A true camera powerhouse.",
+    colors: [
+      { name: "Asteroid Black", hex: "#1c1c22", image: "assets/vivo.png" },
+      { name: "Startrail Blue", hex: "#2a4a6a", image: "assets/vivo.png" }
+    ],
+    storage: [
+      { size: "256GB", extraPrice: 0 },
+      { size: "512GB", extraPrice: 100 }
+    ],
+    specs: {
+      display:   '6.78" AMOLED, 120Hz, 3000 nits',
+      processor: "Dimensity 9300 (4nm)",
+      camera:    "50MP Zeiss 1\" Main + 50MP 4x Periscope + 50MP Ultra Wide",
+      battery:   "5400 mAh, 100W FlashCharge",
+      os:        "Android 14 (OriginOS 4)",
+      weight:    "225g"
+    },
+    featured: false
+  },
+  {
+    id: "realme-gt-6",
+    name: "Realme GT 6",
+    brand: "Realme",
+    price: 549,
+    rating: 4.6,
+    reviewsCount: 92,
+    description: "Realme GT 6 brings flagship Snapdragon 8s Gen 3 performance to the masses with a 120Hz AMOLED display, 120W SUPERVOOC charging, and Sony LYT-808 main sensor.",
+    colors: [
+      { name: "Fluid Silver", hex: "#c0c8d0", image: "assets/realme.png" },
+      { name: "Razor Green",  hex: "#2d4a35", image: "assets/realme.png" }
+    ],
+    storage: [
+      { size: "256GB", extraPrice: 0 },
+      { size: "512GB", extraPrice: 80 }
+    ],
+    specs: {
+      display:   '6.78" AMOLED, 120Hz, 4000 nits',
+      processor: "Snapdragon 8s Gen 3 (4nm)",
+      camera:    "50MP Sony LYT-808 Main + 8MP Ultra Wide + 2MP Macro",
+      battery:   "5500 mAh, 120W SUPERVOOC",
+      os:        "Android 14 (Realme UI 5.0)",
+      weight:    "199g"
+    },
+    featured: false
   }
 ];
